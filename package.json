@@ -13,8 +13,9 @@
     "@slack/bolt": "^1.2.0",
     "@slack/events-api": "^2.3.0",
     "dotenv": "^8.1.0",
-    "ffmpeg": "0.0.4",
+    "mp3-cutter": "^1.0.6",
     "request": "^2.88.0",
+    "shortid": "^2.2.15",
     "ytdl": "^0.12.0"
   }
 }
