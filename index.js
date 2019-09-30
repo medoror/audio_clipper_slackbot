@@ -7,7 +7,7 @@ const ytdl = require('ytdl-core');
 const getInfo = require('ytdl-core');
 const request = require('request');
 const shortid = require('shortid');
-const MP3Cutter = require('mp3-cutter');
+const rimraf = require('rimraf');
 
 const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -15,6 +15,9 @@ const app = new App({
 });
 
 const DEFAULT_DURATION = 10;
+const FRAME_FOR_128_KBPS_BYTES = 417;
+const FRAME_FOR_192_KBPS_BYTES = 626;
+const FRAME_CONSTANT_LENGTH_TIME = 0.026;
 
 function validateYouTubeUrl(potentialUrl) {
     if (potentialUrl !== undefined || potentialUrl !== '') {
@@ -35,15 +38,20 @@ function generateAudioFileName() {
     return shortid.generate().concat('.mp3');
 }
 
-function clipMp3(audioFilename, duration) {
-    let newCutFilename = '_'.concat(audioFilename);
-    MP3Cutter.cut({
-        src: audioFilename,
-        target: newCutFilename,
-        start: 0,
-        end: duration
+function clipMp3(title, audioFilename, duration) {
+    let frames = duration / FRAME_CONSTANT_LENGTH_TIME;
+    const truncatedSizeBytes = Math.round(((FRAME_FOR_128_KBPS_BYTES * frames) / 1024) * 1000);
+    const fd = fs.openSync(audioFilename, 'r+');
+    fs.ftruncate(fd, truncatedSizeBytes, (err) => {
+        console.log('...truncated file');
+        uploadToSlack(title, audioFilename);
     });
-    return newCutFilename;
+}
+
+function deleteMp3Files() {
+    rimraf('./*.mp3', function () {
+        console.log('...deleting all mp3s');
+    });
 }
 
 function uploadToSlack(title, audioFilename) {
@@ -59,6 +67,7 @@ function uploadToSlack(title, audioFilename) {
         },
     }, function (err, response) {
         console.log(JSON.parse(response.body));
+        deleteMp3Files();
     });
 }
 
@@ -69,15 +78,16 @@ function downloadFromYoutube(title, url, audioFilename, duration) {
 
     }).pipe(fs.createWriteStream(audioFilename, {flags: 'a'}))
         .on('finish', () => {
-        console.log('wrote all data to file');
-        uploadToSlack(title, clipMp3(audioFilename, duration));
+        console.log('...wrote all data to file');
+
+        clipMp3(title, audioFilename, duration);
     });
 }
 
 app.command('/audio', async ({payload, ack, say}) => {
     ack();
     let ytLink = payload.text.split(" ")[0];
-    let duration = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION)
+    let duration = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION);
 
     if (validateYouTubeUrl(ytLink)) {
         let title = '';
@@ -88,8 +98,9 @@ app.command('/audio', async ({payload, ack, say}) => {
         });
         downloadFromYoutube(title, ytLink, audioFilename, duration);
 
+
     } else {
-        say("USAGE: /audio [youtube-url] [ duration (DEFAULT_DURATION seconds default) ]")
+        say("USAGE: /audio [youtube-url] [ duration (10 seconds default) ]")
     }
 });
 
