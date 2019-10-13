@@ -7,13 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "medoror",
   "license": "ISC",
   "dependencies": {
     "@slack/bolt": "^1.2.0",
     "@slack/events-api": "^2.3.0",
     "dotenv": "^8.1.0",
-    "mp3-cutter": "^1.0.6",
     "request": "^2.88.0",
     "rimraf": "^3.0.0",
     "shortid": "^2.2.15",

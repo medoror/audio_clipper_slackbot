@@ -6,3 +6,6 @@ take 10 seconds clips.  Use the duration argument (in seconds) to add audio time
 
 ## Usage
 /audio [youtube - url] [duration - in seconds]
+
+# Improvements
+Take youtube videos at a specific time

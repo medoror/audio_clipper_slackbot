@@ -38,13 +38,18 @@ function generateAudioFileName() {
     return shortid.generate().concat('.mp3');
 }
 
-function clipMp3(title, audioFilename, duration) {
+function clipMp3(title, audioFilename, duration, channel) {
     let frames = duration / FRAME_CONSTANT_LENGTH_TIME;
     const truncatedSizeBytes = Math.round(((FRAME_FOR_128_KBPS_BYTES * frames) / 1024) * 1000);
     const fd = fs.openSync(audioFilename, 'r+');
     fs.ftruncate(fd, truncatedSizeBytes, (err) => {
-        console.log('...truncated file');
-        uploadToSlack(title, audioFilename);
+        if(!err){
+            console.log('...truncated file');
+            uploadToSlack(title, audioFilename, channel);
+        }else{
+            console.error('error truncating file: '+audioFilename);
+        }
+
     });
 }
 
@@ -54,7 +59,7 @@ function deleteMp3Files() {
     });
 }
 
-function uploadToSlack(title, audioFilename) {
+function uploadToSlack(title, audioFilename, channel) {
     request.post({
         url: 'https://slack.com/api/files.upload',
         formData: {
@@ -62,7 +67,7 @@ function uploadToSlack(title, audioFilename) {
             title: title,
             filename: audioFilename,
             filetype: "mp3",
-            channels: "bot-testing",  // TODO: should be replaced with channel in the payload
+            channels: channel,
             file: fs.createReadStream(audioFilename, {flags: 'r'}),
         },
     }, function (err, response) {
@@ -71,7 +76,7 @@ function uploadToSlack(title, audioFilename) {
     });
 }
 
-function downloadFromYoutube(title, url, audioFilename, duration) {
+function downloadFromYoutube(title, url, audioFilename, duration, channel) {
     ytdl(url, {
         filter: 'audioonly',
         quality: 'highestaudio',
@@ -80,7 +85,7 @@ function downloadFromYoutube(title, url, audioFilename, duration) {
         .on('finish', () => {
         console.log('...wrote all data to file');
 
-        clipMp3(title, audioFilename, duration);
+        clipMp3(title, audioFilename, duration, channel);
     });
 }
 
@@ -91,14 +96,14 @@ app.command('/audio', async ({payload, ack, say}) => {
 
     if (validateYouTubeUrl(ytLink)) {
         let title = '';
+        let channel = '';
         let audioFilename = generateAudioFileName();
         getInfo(ytLink, (err, info) => {
             if (err) throw err;
             title = info.title;
+            channel = payload.channel_name;
         });
-        downloadFromYoutube(title, ytLink, audioFilename, duration);
-
-
+        downloadFromYoutube(title, ytLink, audioFilename, duration, channel);
     } else {
         say("USAGE: /audio [youtube-url] [ duration (10 seconds default) ]")
     }
