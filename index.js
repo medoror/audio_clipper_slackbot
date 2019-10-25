@@ -8,6 +8,8 @@ const getInfo = require('ytdl-core');
 const request = require('request');
 const shortid = require('shortid');
 const rimraf = require('rimraf');
+const ffmpeg = require('fluent-ffmpeg');
+const ytUtils = require('./src/youtubeUtils');
 
 const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -19,15 +21,32 @@ const FRAME_FOR_128_KBPS_BYTES = 417;
 const FRAME_FOR_192_KBPS_BYTES = 626;
 const FRAME_CONSTANT_LENGTH_TIME = 0.026;
 
-function validateYouTubeUrl(potentialUrl) {
+
+
+function checkYoutubeUrlForTimestamp(potentialUrl) {
+    let seconds;
+
+    // Urls come in two forms
+    // 1. https://youtu.be/DE70MkLGp9g?t=912
+    // 1. https://www.youtube.com/watch?v=DE70MkLGp9g&t=2m54s
     if (potentialUrl !== undefined || potentialUrl !== '') {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/;
-        const match = potentialUrl.match(regExp);
-        if (match && match[2].length === 11) {
-            return true;
+        let regExp = /t=(.*)/;
+        let match = potentialUrl.match(regExp);
+        if (match && match[1]) {
+            return seconds = match[1];
         }
+        regExp = /t=([0-9]*)m([0-9]*)s/;
+        match = potentialUrl.match(regExp);
+        if (match && match[1] && match[2]) {
+            return seconds = convertMintuesToSeconds(match[1], match[2]);
+        }
+
     }
-    return false;
+    return seconds;
+}
+
+function convertMintuesToSeconds(minutes, seconds) {
+    return (minutes * 60) + seconds;
 }
 
 function generateDuration(duration, defaultDuration) {
@@ -43,11 +62,11 @@ function clipMp3(title, audioFilename, duration, channel) {
     const truncatedSizeBytes = Math.round(((FRAME_FOR_128_KBPS_BYTES * frames) / 1024) * 1000);
     const fd = fs.openSync(audioFilename, 'r+');
     fs.ftruncate(fd, truncatedSizeBytes, (err) => {
-        if(!err){
+        if (!err) {
             console.log('...truncated file');
             uploadToSlack(title, audioFilename, channel);
-        }else{
-            console.error('error truncating file: '+audioFilename);
+        } else {
+            console.error('error truncating file: ' + audioFilename);
         }
 
     });
@@ -76,17 +95,39 @@ function uploadToSlack(title, audioFilename, channel) {
     });
 }
 
-function downloadFromYoutube(title, url, audioFilename, duration, channel) {
+function downloadFromYoutubeFull(title, url, audioFilename, duration, channel) {
     ytdl(url, {
         filter: 'audioonly',
         quality: 'highestaudio',
 
     }).pipe(fs.createWriteStream(audioFilename, {flags: 'a'}))
         .on('finish', () => {
-        console.log('...wrote all data to file');
+            console.log('...wrote all data to file');
 
-        clipMp3(title, audioFilename, duration, channel);
-    });
+            clipMp3(title, audioFilename, duration, channel);
+        });
+}
+
+function downloadFromYoutubePartial(title, url, timestamp, audioFilename, duration, channel) {
+    // outStream = fs.createWriteStream(audioFilename);
+    ffmpeg().input(
+        ytdl(url, {
+            filter: function (format) {
+                if (format.container === 'webm' && format.resolution === null) {
+                    return format
+                }
+            }
+        })
+    )
+        .format('webm')
+        .seekInput(timestamp)
+        .duration(duration)
+        .pipe(fs.createWriteStream(audioFilename, {flags: 'a'}))
+        .on('finish', () => {
+            console.log('...wrote all data to file');
+
+            uploadToSlack(title, audioFilename, channel)
+        });
 }
 
 app.command('/audio', async ({payload, ack, say}) => {
@@ -94,7 +135,7 @@ app.command('/audio', async ({payload, ack, say}) => {
     let ytLink = payload.text.split(" ")[0];
     let duration = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION);
 
-    if (validateYouTubeUrl(ytLink)) {
+    if (ytUtils.validateYouTubeUrl(ytLink)) {
         let title = '';
         let channel = '';
         let audioFilename = generateAudioFileName();
@@ -103,7 +144,14 @@ app.command('/audio', async ({payload, ack, say}) => {
             title = info.title;
             channel = payload.channel_name;
         });
-        downloadFromYoutube(title, ytLink, audioFilename, duration, channel);
+
+        let timestamp = checkYoutubeUrlForTimestamp(ytLink);
+
+        if (timestamp) {
+            downloadFromYoutubePartial(title, ytLink, timestamp, audioFilename, duration, channel)
+        } else {
+            downloadFromYoutubeFull(title, ytLink, audioFilename, duration, channel);
+        }
     } else {
         say("USAGE: /audio [youtube-url] [ duration (10 seconds default) ]")
     }
