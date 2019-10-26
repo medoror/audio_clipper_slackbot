@@ -2,8 +2,9 @@
   "name": "audio_clipper",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
+    "start": "tsc && node dist/index.js",
     "test": "mocha"
   },
   "keywords": [],
@@ -12,15 +13,20 @@
   "dependencies": {
     "@slack/bolt": "^1.2.0",
     "@slack/events-api": "^2.3.0",
+    "@types/mocha": "^5.2.7",
     "dotenv": "^8.1.0",
     "fluent-ffmpeg": "^2.1.2",
+    "mp3-duration": "^1.1.0",
     "request": "^2.88.0",
     "rimraf": "^3.0.0",
     "shortid": "^2.2.15",
     "ytdl": "^0.12.0"
   },
   "devDependencies": {
+    "@types/node": "^12.11.7",
     "chai": "^4.2.0",
-    "mocha": "^6.2.2"
+    "mocha": "^6.2.2",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.4"
   }
 }
