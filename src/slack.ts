@@ -10,29 +10,27 @@ export class Slack {
     }
 
     async uploadToSlack(audioFilename) {
-
         let requestPromise = () => {
             return new Promise((resolve, reject) => {
                 request.post({
                     url: 'https://slack.com/api/files.upload',
                     formData: {
                         token: process.env.SLACK_BOT_TOKEN,
-                        // title: title,
                         filename: audioFilename,
                         filetype: "mp3",
                         channels: this.channel,
                         file: fs.createReadStream(audioFilename, {flags: 'r'}),
                     },
-                }, function (err, response) {
+                }, function postRequestCallback (err, response) {
+                    console.log(`the error: ${err}`);
                     reject(err);
                     resolve(JSON.parse(response.body));
                 });
-
-            })
+            });
         };
         await requestPromise().then( response => {
-            console.log(response)}).catch(err => console.log(err));
+            console.log(`Slack response: ${response}`)}).catch(err => console.log(`Slack Error: ${err}`));
 
-        deleteMp3Files();
+        deleteMp3Files( () => {console.log(`${audioFilename} file deleted`)});
     }
 }

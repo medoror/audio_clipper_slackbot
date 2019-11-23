@@ -1,9 +1,15 @@
 require('dotenv').config();
-const Slack = require('./slack');
+
+import {Slack} from "./slack";
+import {YoutubeVideo} from "./youtubeVideo";
+import {VideoInterface} from "./videoInterface";
+
+import {App} from "@slack/bolt";
+
 const {validateYouTubeUrl} = require('./youtubeUtils');
-const {App} = require('@slack/bolt');
+
 const shortid = require('shortid');
-const {YoutubeVideo} = require('./youtubeVideo');
+
 
 const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -22,22 +28,23 @@ function generateAudioFileName() {
 
 app.command('/audio', async ({payload, ack, say}) => {
     ack();
-    let link = payload.text.split(" ")[0];
-    let duration = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION);
-    let audioFilename = generateAudioFileName();
-    let videoFormat;
+    let link: string = payload.text.split(" ")[0];
+    let duration :number  = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION);
+    let audioFilename: string = generateAudioFileName();
+    let videoFormat: VideoInterface;
 
-    const slackApi = new Slack(payload.channel);
+    const slackApi = new Slack(payload.channel_name);
 
     if (validateYouTubeUrl(link)) {
-        videoFormat = new YoutubeVideo(link, duration, audioFilename);
+        videoFormat = new YoutubeVideo(link, audioFilename, duration);
     } else {
-        say("Example USAGE f" +
-            "or youtube: /audio [youtube-url] [ duration (10 seconds default) ]")
+        say("Example USAGE for youtube: " +
+            "/audio [youtube-url] [ duration (10 seconds default) ]")
+        return;
     }
-    videoFormat.performDownload();
+    await videoFormat.performDownload();
 
-    slackApi.uploadToSlack(audioFilename);
+    await slackApi.uploadToSlack(audioFilename);
 });
 
 

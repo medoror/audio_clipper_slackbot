@@ -4,8 +4,8 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && node dist/index.js",
-    "test": "mocha"
+    "start": "tsc && NODE_DEBUG=request node dist/index.js",
+    "test": "mocha -r ts-node/register test/**/*.ts"
   },
   "keywords": [],
   "author": "medoror",

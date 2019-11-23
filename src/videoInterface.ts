@@ -1,3 +1,3 @@
 export interface VideoInterface{
-    performDownload(): void;
+    performDownload(): Promise<void>;
 }

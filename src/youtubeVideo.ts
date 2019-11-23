@@ -26,19 +26,20 @@ export class YoutubeVideo implements VideoInterface {
         // });
     }
 
-    performDownload(): void {
+    async performDownload(): Promise<void> {
         let timestamp = checkYoutubeUrlForTimestamp(this.link);
 
         if (timestamp) {
-            this.downloadFromYoutubePartial(this.link, timestamp, this.audioFilename, this.duration)
+            await this.downloadFromYoutubePartial(this.link, timestamp, this.audioFilename, this.duration)
         } else {
-            this.downloadFromYoutubeFull(this.link, this.audioFilename, this.duration);
+            await this.downloadFromYoutubeFull(this.link, this.audioFilename, this.duration);
         }
 
     }
 
     async downloadFromYoutubeFull(link: any, audioFilename: any, duration: any) {
 
+        // TODO handle the promises here
         let ytdlPromise = () => {
             return new Promise(
                 (resolve, reject) => {
@@ -59,6 +60,7 @@ export class YoutubeVideo implements VideoInterface {
 
     async downloadFromYoutubePartial(link, timestamp, audioFilename, duration) {
 
+        // TODO handle the promises here
         let ytdlPromise = () => {
             return new Promise(
                 (resolve, reject) => {
