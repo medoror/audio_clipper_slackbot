@@ -1,11 +1,10 @@
 import {describe} from "mocha"
 import * as fs from "fs";
-import {clipMp3} from "../src/fileUtils";
+import {clipMp3, deleteMp3Files} from "../src/fileUtils";
 import * as path from "path";
 
 const {assert, expect} = require('chai');
 
-const {deleteMp3Files} = require('../src/fileUtils');
 
 const mp3Duration = require('mp3-duration');
 

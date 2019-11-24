@@ -1,36 +1,30 @@
-const request = require('request');
-const fs = require('fs');
-const {deleteMp3Files} = require('./fileUtils');
+const fetch = require('node-fetch');
+const FormData = require('form-data');
+
+import * as fs from 'fs';
 
 export class Slack {
+
     channel: string;
 
     constructor(channel: string) {
         this.channel = channel;
     }
 
-    async uploadToSlack(audioFilename) {
-        let requestPromise = () => {
-            return new Promise((resolve, reject) => {
-                request.post({
-                    url: 'https://slack.com/api/files.upload',
-                    formData: {
-                        token: process.env.SLACK_BOT_TOKEN,
-                        filename: audioFilename,
-                        filetype: "mp3",
-                        channels: this.channel,
-                        file: fs.createReadStream(audioFilename, {flags: 'r'}),
-                    },
-                }, function postRequestCallback (err, response) {
-                    console.log(`the error: ${err}`);
-                    reject(err);
-                    resolve(JSON.parse(response.body));
-                });
-            });
-        };
-        await requestPromise().then( response => {
-            console.log(`Slack response: ${response}`)}).catch(err => console.log(`Slack Error: ${err}`));
+    uploadToSlack(audioFilename) {
+        const form = new FormData();
 
-        deleteMp3Files( () => {console.log(`${audioFilename} file deleted`)});
+        form.append('file', fs.createReadStream(audioFilename, {flags: 'r'}));
+        form.append('token', process.env.SLACK_BOT_TOKEN);
+        form.append('channels', this.channel);
+        form.append('filetype', "mp3");
+        form.append('filename', audioFilename);
+
+        fetch('https://slack.com/api/files.upload', {method: 'POST', body: form})
+            .then(res => res.json())
+            .then(json => {
+                console.log(json)
+            })
+            .catch(err => console.log(`Slack Error: ${err}`));
     }
 }

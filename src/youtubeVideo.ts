@@ -1,13 +1,13 @@
 import {VideoInterface} from './videoInterface'
-
 import {checkYoutubeUrlForTimestamp} from './youtubeUtils';
-import {getInfo} from 'ytdl-core'
+import * as fs from 'fs';
+import {clipMp3} from "./fileUtils";
 
 const ytdl = require('ytdl-core');
-const fs = require('fs');
-const ffmpeg = require('fluent-ffmpeg');
 
-const {clipMp3} = require('./fileUtils');
+const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
+const ffmpeg = require('fluent-ffmpeg');
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 
 export class YoutubeVideo implements VideoInterface {
@@ -19,34 +19,27 @@ export class YoutubeVideo implements VideoInterface {
         this.link = ytLink;
         this.duration = duration;
         this.audioFilename = audioFilename;
-
-        // getInfo(ytLink, (err, info) => {
-        //     if (err) throw err;
-        //     this.title = info.title;
-        // });
     }
 
     async performDownload(): Promise<void> {
         let timestamp = checkYoutubeUrlForTimestamp(this.link);
 
         if (timestamp) {
-            await this.downloadFromYoutubePartial(this.link, timestamp, this.audioFilename, this.duration)
+            await this.downloadFromYoutubePartial(timestamp)
         } else {
-            await this.downloadFromYoutubeFull(this.link, this.audioFilename, this.duration);
+            await this.downloadFromYoutubeFull();
         }
 
     }
 
-    async downloadFromYoutubeFull(link: any, audioFilename: any, duration: any) {
-
-        // TODO handle the promises here
+    async downloadFromYoutubeFull() {
         let ytdlPromise = () => {
             return new Promise(
                 (resolve, reject) => {
                     ytdl(this.link, {
                         filter: 'audioonly',
                         quality: 'highestaudio',
-                    }).pipe(fs.createWriteStream(audioFilename, {flags: 'a'}))
+                    }).pipe(fs.createWriteStream(this.audioFilename, {flags: 'a'}))
                         .on('finish', () => {
                             resolve();
                         });
@@ -54,38 +47,38 @@ export class YoutubeVideo implements VideoInterface {
             );
         };
 
-        await ytdlPromise();
-        clipMp3(audioFilename, duration);
+        await ytdlPromise().then(() => {
+            console.log(`Video Downloaded`)
+        }).catch(() => console.log(`Error Downloading Video`));
+        clipMp3(this.audioFilename, this.duration);
     }
 
-    async downloadFromYoutubePartial(link, timestamp, audioFilename, duration) {
-
-        // TODO handle the promises here
+    async downloadFromYoutubePartial(timestamp) {
         let ytdlPromise = () => {
             return new Promise(
                 (resolve, reject) => {
                     ffmpeg().input(
-                        ytdl(link, {
+                        ytdl(this.link, {
                             filter: function (format) {
                                 if (format.container === 'webm' && format.resolution === null) {
-                                    return format
+                                    return true;
                                 }
                             }
                         })
                     ).format('webm')
                         .seekInput(timestamp)
-                        .duration(duration)
-                        .pipe(fs.createWriteStream(audioFilename, {flags: 'a'}))
+                        .duration(this.duration)
+                        .pipe(fs.createWriteStream(this.audioFilename, {flags: 'a'}))
                         .on('finish', () => {
                             resolve();
                         });
                 }
             );
         };
-
-        await ytdlPromise();
+        await ytdlPromise().then(() => {
+            console.log(`Video Downloaded`)
+        }).catch(() => console.log(`Error Downloading Video`));
     }
-
 }
 
 

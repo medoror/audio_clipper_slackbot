@@ -1,22 +1,20 @@
+import {deleteMp3Files} from "./fileUtils";
+
 require('dotenv').config();
 
 import {Slack} from "./slack";
 import {YoutubeVideo} from "./youtubeVideo";
 import {VideoInterface} from "./videoInterface";
-
+import {validateYouTubeUrl} from "./youtubeUtils";
 import {App} from "@slack/bolt";
 
-const {validateYouTubeUrl} = require('./youtubeUtils');
-
 const shortid = require('shortid');
-
+const DEFAULT_DURATION = 10;
 
 const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
     token: process.env.SLACK_BOT_TOKEN
 });
-
-const DEFAULT_DURATION = 10;
 
 function generateDuration(duration, defaultDuration) {
     return !duration || isNaN(parseInt(duration)) ? defaultDuration : duration;
@@ -45,6 +43,11 @@ app.command('/audio', async ({payload, ack, say}) => {
     await videoFormat.performDownload();
 
     await slackApi.uploadToSlack(audioFilename);
+
+    // delete the downloaded mp3 when finished
+    deleteMp3Files(() => {
+        console.log(`${audioFilename} file deleted`);
+    });
 });
 
 
