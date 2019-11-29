@@ -16,12 +16,17 @@ This repo represents my MVP attempt to upload sound clips via a slackbot.  Inste
 ## Usage
 
 **Usage 1** - `/audio https://www.youtube.com/watch?v=WBC_CepxWHU`
-This will upload audio from the beginning of the given youtube url up to the given duration( in seconds).  If no
+This will upload audio from the beginning of the given youtube url up to the given duration (in seconds).  If no
 duration is given, the default is 10 seconds.
 
 **Usage 2** - `/audio https://youtu.be/WBC_CepxWHU?t=3 3`
 This will upload audio from the beginning of a given youtube url at the timestamp up to the given
-duration(in seconds).
+duration (in seconds).
+
+
+## Using this slackbot
+
+TBD
 
 ## Improvements
 1. Refactor all mp3 clipping logic to use `ffmpeg`

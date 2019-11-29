@@ -2,11 +2,11 @@ import * as fs from 'fs';
 
 const rimraf = require('rimraf');
 
-const FRAME_SIZE_BYTES_FOR_128_KBPS_BITRATE = 417;
-const FRAME_SIZE_BYTES_FOR_192_KBPS_BITRATE = 626;
-const FRAME_CONSTANT_LENGTH_TIME_SECONDS = 0.026;
-const BYTES_PER_SECOND_TO_KILO_BYTES_PER_SECOND = 1024;
-const KILOBYTES_TO_BYTES = 1000;
+const FRAME_SIZE_BYTES_FOR_128_KBPS_BITRATE :number = 417;
+const FRAME_SIZE_BYTES_FOR_192_KBPS_BITRATE :number = 626;
+const FRAME_CONSTANT_LENGTH_TIME_SECONDS :number = 0.026;
+const BYTES_PER_SECOND_TO_KILO_BYTES_PER_SECOND :number = 1024;
+const KILOBYTES_TO_BYTES :number = 1000;
 
 
 export const deleteMp3Files = (callback) => {
@@ -14,8 +14,7 @@ export const deleteMp3Files = (callback) => {
 };
 
 /**
- * Takes an mp3 and truncates and augments the size, removing
- * bytes after the given duration
+ * Takes an mp3 and augments the size, removing bytes after the given duration
  *
  * More info about this logic here: https://stackoverflow.com/questions/42814866/ios-download-only-few-seconds-from-mp3-file
  * @param audioFilename

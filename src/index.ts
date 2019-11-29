@@ -9,7 +9,7 @@ import {validateYouTubeUrl} from "./youtubeUtils";
 import {App} from "@slack/bolt";
 
 const shortid = require('shortid');
-const DEFAULT_DURATION = 10;
+const DEFAULT_DURATION_SECONDS: number = 10;
 
 const app = new App({
     signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -27,7 +27,7 @@ function generateAudioFileName() {
 app.command('/audio', async ({payload, ack, say}) => {
     ack();
     let link: string = payload.text.split(" ")[0];
-    let duration :number  = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION);
+    let duration :number  = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION_SECONDS);
     let audioFilename: string = generateAudioFileName();
     let videoFormat: VideoInterface;
 

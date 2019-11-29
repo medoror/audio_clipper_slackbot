@@ -8,13 +8,18 @@ export const validateYouTubeUrl = (potentialUrl: string) => {
     return false;
 };
 
+/**
+ * Will apply regex on given url and return the matches object
+ * @param potentialUrl
+ * @param regex
+ */
 function parseUrl(potentialUrl: string, regex: RegExp) {
     return potentialUrl.match(regex);
 }
 
 
 /**
- * Given a youtube url will return the number of seconds located in the
+ * Given a youtube url this method will return the number of seconds located in the
  * timestamp portion of the url or undefined if it doesn't exist.
  * @param potentialUrl
  */
