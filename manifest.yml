@@ -1,0 +1,4 @@
+---
+applications:
+- name: audio-clipper-slackbot
+  command: npm start
