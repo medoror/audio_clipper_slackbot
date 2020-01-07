@@ -27,27 +27,31 @@ function generateAudioFileName() {
 app.command('/audio', async ({payload, ack, say}) => {
     ack();
     let link: string = payload.text.split(" ")[0];
-    let duration :number  = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION_SECONDS);
+    let duration: number = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION_SECONDS);
     let audioFilename: string = generateAudioFileName();
     let videoFormat: VideoInterface;
 
-    const slackApi = new Slack(payload.channel_name);
-
     if (validateYouTubeUrl(link)) {
+
         videoFormat = new YoutubeVideo(link, audioFilename, duration);
     } else {
         say("Example USAGE for youtube: " +
             "/audio [youtube-url] [ duration (10 seconds default) ]")
         return;
     }
-    await videoFormat.performDownload();
+    try {
+        await videoFormat.performDownload();
 
-    await slackApi.uploadToSlack(audioFilename);
+        const slackApi = new Slack(payload.channel_name);
+        await slackApi.uploadToSlack(audioFilename);
 
-    // delete the downloaded mp3 when finished
-    deleteMp3Files(() => {
-        console.log(`${audioFilename} file deleted`);
-    });
+        // delete the downloaded mp3 when finished
+        deleteMp3Files();
+    } catch (err) {
+        console.log("Something went wrong: " + err)
+    }
+
+
 });
 
 

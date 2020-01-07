@@ -29,5 +29,4 @@ duration (in seconds).
 TBD
 
 ## Improvements
-1. Refactor all mp3 clipping logic to use `ffmpeg`
 1. Tests for slack api and youtube video apis
