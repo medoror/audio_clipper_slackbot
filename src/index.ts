@@ -31,9 +31,8 @@ app.command('/audio', async ({payload, ack, say}) => {
     let audioFilename: string = generateAudioFileName();
     let videoFormat: VideoInterface;
 
-    const slackApi = new Slack(payload.channel_name);
-
     if (validateYouTubeUrl(link)) {
+
         videoFormat = new YoutubeVideo(link, audioFilename, duration);
     } else {
         say("Example USAGE for youtube: " +
@@ -42,6 +41,7 @@ app.command('/audio', async ({payload, ack, say}) => {
     }
     await videoFormat.performDownload();
 
+    const slackApi = new Slack(payload.channel_name);
     await slackApi.uploadToSlack(audioFilename);
 
     // delete the downloaded mp3 when finished
