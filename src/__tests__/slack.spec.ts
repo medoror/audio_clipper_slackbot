@@ -2,11 +2,11 @@ import {Slack} from "../slack";
 
 import fetch from 'node-fetch';
 const FormData = require('form-data');
+const { Response } = jest.requireActual('node-fetch');
 
-jest.mock('node-fetch', () => jest.fn(()=> {return {test: "test"}}));
-// jest.mock('node-fetch', () => jest.fn());
+jest.mock('node-fetch', () => jest.fn());
 
-function generateFormData() {
+function formDataStub() :FormData {
     const form = new FormData();
 
     form.append('file', "file contents");
@@ -18,11 +18,15 @@ function generateFormData() {
 }
 
 describe('slack api', () => {
-    test('calls upload user with the correct arguments',async () => {
+    test('verifies fetch is called',async () => {
+
+        (fetch as jest.MockedFunction<typeof fetch>).mockResolvedValueOnce(new Response(JSON.stringify({test: "test"})));
+
         const slack = new Slack("the channel");
-        slack.setFormData(generateFormData());
+        slack.setFormData(formDataStub());
         await slack.uploadToSlack("audioFilename");
 
         expect(fetch as jest.MockedFunction<typeof fetch>).toHaveBeenCalledTimes(1);
+
     });
 });

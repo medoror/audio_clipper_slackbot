@@ -45,9 +45,8 @@ app.command('/audio', async ({payload, ack, say}) => {
     await slackApi.uploadToSlack(audioFilename);
 
     // delete the downloaded mp3 when finished
-    deleteMp3Files(() => {
-        console.log(`${audioFilename} file deleted`);
-    });
+    deleteMp3Files();
+
 });
 
 

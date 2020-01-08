@@ -25,7 +25,7 @@ export class Slack {
         }
 
         try {
-            const result = await fetch('https://slack.com/api/files.upload', {method: 'POST', body: this.formData})
+            const result = await fetch('https://slack.com/api/files.upload', {method: 'POST', body: this.formData});
             const json = await result.json();
             console.log(json)
 
@@ -39,7 +39,7 @@ export class Slack {
     }
 
 
-    getFormData() {
+    getFormData(): FormData {
         return this.formData;
     }
 }
