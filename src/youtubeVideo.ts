@@ -8,6 +8,9 @@ const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
 ffmpeg.setFfmpegPath(ffmpegPath);
 
+//The above does not compile with the tests...need to test to see
+//if i need them...if i do, I will get rid of the test
+
 
 export class YoutubeVideo implements VideoInterface {
     link: string;

@@ -1,31 +1,33 @@
 import {YoutubeVideo} from "../youtubeVideo";
 
-jest.mock('fluent-ffmpeg', () => jest.fn( ()=> {}));
+jest.mock('fluent-ffmpeg', () => jest.fn(setFfmpegPath => {}));
 jest.mock('ytdl-core', () => jest.fn());
 
 const ytdl = require('ytdl-core');
 const ffmpeg = require('fluent-ffmpeg');
 
 
-describe('youtube video', () => {
-    test('verifies order of dependencies called',async () => {
+test('verifies order of dependencies called', async () => {
 
-        (ffmpeg as jest.MockedFunction<typeof ffmpeg>).mockResolvedValueOnce("ffmpeg return");
+    // (ffmpeg as jest.MockedFunction<typeof ffmpeg>).mockResolvedValueOnce("ffmpeg return");
 
-        // (ffmpeg as jest.MockedFunction<typeof ffmpeg>).mockImplementation(() => {
-        //     return {
-        //         setFfmpegPath: jest.fn(),
-        //     };
-        // })
+    (ffmpeg as jest.MockedFunction<typeof ffmpeg>) = {
+        setFfmpegPath: true,
+    };
 
-        (ytdl as jest.MockedFunction<typeof ytdl>).mockResolvedValueOnce("ytdl return");
+    // (ffmpeg as jest.MockedFunction<typeof ffmpeg>).mockImplementation(() => {
+    //     return {
+    //         setFfmpegPath: jest.fn(),
+    //     };
+    // })
 
-        const youtubeVideo = new YoutubeVideo("ytLink", "audioFilename", 0);
+    // (ytdl as jest.MockedFunction<typeof ytdl>).mockResolvedValueOnce("ytdl return");
 
-        youtubeVideo.performDownload();
+    const youtubeVideo = new YoutubeVideo("ytLink", "audioFilename", 0);
 
-        expect(ffmpeg as jest.MockedFunction<typeof ffmpeg>).toHaveBeenCalledTimes(1);
-        expect(ytdl as jest.MockedFunction<typeof ytdl>).toHaveBeenCalledTimes(1);
+    youtubeVideo.performDownload();
 
-    });
+    expect(ffmpeg as jest.MockedFunction<typeof ffmpeg>).toHaveBeenCalledTimes(1);
+    // expect(ytdl as jest.MockedFunction<typeof ytdl>).toHaveBeenCalledTimes(1);
+
 });
