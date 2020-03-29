@@ -96,3 +96,5 @@ typings/
 .DS_Store
 
 .idea/
+
+credentials.yml
