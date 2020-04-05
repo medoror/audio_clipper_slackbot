@@ -48,6 +48,22 @@ jobs:
       - get: audio-clipper
         passed: [run-ci-tests]
         trigger: true
+      - task: deploy
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+             repository: node
+             tag: "8.12-alpine"
+          inputs:
+            - name: audio-clipper
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd audio-clipper
       - put: deply-app
         params:
           manifest: audio-clipper/manifest.yml
