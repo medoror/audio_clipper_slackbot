@@ -4,23 +4,17 @@ resources:
     source:
       uri: https://github.com/medoror/audio_clipper_slackbot.git
       branch: master
-      username: ((github-username))
-      password: ((github-password))
-
-  - name: node-docker-image
-    type: docker-image
-    source:
-      repository: node
-      tag: "8.12-alpine"
+      username: ((github.username))
+      password: ((github.password))
 
   - name: deply-app
     type: cf
     source:
-      api: ((cf-api-url))
-      username: ((cf-api-email))
-      password: ((cf-api-password))
-      organization: ((cf-api-org))
-      space: ((cf-api-space))
+      api: ((cf.api))
+      username: ((cf.username))
+      password: ((cf.password))
+      organization: ((cf.org))
+      space: ((cf.space))
       skip_cert_check: true
 
 jobs:
@@ -29,8 +23,16 @@ jobs:
     plan:
       - get: audio-clipper
         trigger: true
-      - get: node-docker-image
-      - task: run-testsr
+      - task: run-tests
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+             repository: node
+             tag: "8.12-alpine"
+          inputs:
+            - name: audio-clipper
           run:
             path: /bin/sh
             args:
@@ -38,15 +40,30 @@ jobs:
               - |
                 echo "Node Version: $(node --version)"
                 echo "NPM Version: $(npm --version)"
-                cd audio-clipper-slackbot
+                cd audio-clipper
                 npm install
                 npm test
   - name: deploy
     plan:
       - get: audio-clipper
         passed: [run-ci-tests]
-      - get: deply-app
+        trigger: true
       - task: deploy
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+             repository: node
+             tag: "8.12-alpine"
+          inputs:
+            - name: audio-clipper
+          run:
+            path: /bin/sh
+            args:
+              - -c
+              - |
+                cd audio-clipper
       - put: deply-app
         params:
           manifest: audio-clipper/manifest.yml
