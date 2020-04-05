@@ -63,6 +63,8 @@ jobs:
             args:
               - -c
               - |
+                export SLACK_SIGNING_SECRET=((slack.secret))
+                export SLACK_BOT_TOKEN=((slack.token))
                 cd audio-clipper
                 npm install
           outputs:
