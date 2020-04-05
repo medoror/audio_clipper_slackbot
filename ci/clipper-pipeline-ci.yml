@@ -48,7 +48,7 @@ jobs:
       - get: audio-clipper
         passed: [run-ci-tests]
         trigger: true
-      - task: deploy
+      - task: build-app
         config:
           platform: linux
           image_resource:
@@ -64,6 +64,10 @@ jobs:
               - -c
               - |
                 cd audio-clipper
+                npm install
+          outputs:
+            - name: deploy-app
       - put: deply-app
         params:
           manifest: audio-clipper/manifest.yml
+          path: audio-clipper
