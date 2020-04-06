@@ -67,6 +67,8 @@ jobs:
                 export SLACK_BOT_TOKEN=((slack.token))
                 cd audio-clipper
                 npm install
+                cd ..
+                cp -r audio-clipper/* deploy-app/
           outputs:
             - name: deploy-app
       - put: deply-app
