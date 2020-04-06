@@ -1,6 +1,6 @@
 ---
 applications:
 - name: audio-clipper-slackbot
-  command: npm start
+  command: node dist/index.js
   buildpacks:
   - nodejs_buildpack
