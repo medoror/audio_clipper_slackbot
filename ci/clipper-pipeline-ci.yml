@@ -7,7 +7,7 @@ resources:
       username: ((github.username))
       password: ((github.password))
 
-  - name: deply-app
+  - name: deploy-app
     type: cf
     source:
       api: ((cf.api))
@@ -44,6 +44,8 @@ jobs:
                 npm install
                 npm test
   - name: deploy
+    public: true
+    serial: true
     plan:
       - get: audio-clipper
         passed: [run-ci-tests]
@@ -58,6 +60,8 @@ jobs:
              tag: "8.12-alpine"
           inputs:
             - name: audio-clipper
+          outputs:
+            - name: artifacts
           run:
             path: /bin/sh
             args:
@@ -69,10 +73,8 @@ jobs:
                 npm install
                 ./node_modules/typescript/bin/tsc
                 cd ..
-                cp -r audio-clipper/* deploy-app/
-          outputs:
-            - name: deploy-app
-      - put: deply-app
+                cp -r audio-clipper/* artifacts/
+      - put: deploy-app
         params:
           manifest: audio-clipper/manifest.yml
-          path: audio-clipper
+          path: artifacts
