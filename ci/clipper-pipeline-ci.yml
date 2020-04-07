@@ -25,6 +25,12 @@ resources:
       space: ((cf.space))
       skip_cert_check: true
 
+  - name: notify
+    type: slack-notification
+    source:
+      url: ((slack-webhook))
+
+
 jobs:
   - name: run-ci-tests
     public: true
@@ -71,7 +77,7 @@ jobs:
                 npm build
                 cd ..
                 cp -r audio-clipper/* audio-clipper-compiled/
-                
+
       - put: deploy-app
         params:
           manifest: audio-clipper/manifest.yml
