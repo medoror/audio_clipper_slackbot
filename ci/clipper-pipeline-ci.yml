@@ -1,3 +1,9 @@
+resource_types:
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+
 resources:
   - name: audio-clipper
     type: git
@@ -16,6 +22,12 @@ resources:
       organization: ((cf.org))
       space: ((cf.space))
       skip_cert_check: true
+
+  - name: notify
+    type: slack-notification
+    source:
+      url: ((slack-webhook))
+
 
 jobs:
   - name: run-ci-tests
@@ -78,3 +90,12 @@ jobs:
         params:
           manifest: audio-clipper/manifest.yml
           path: artifacts
+        on_failure:
+          put: notify
+          params:
+            text: "Commit: failed to deploy"
+        on_success:
+          put: notify
+          params:
+            text: "Commit: deployed successfully"
+
