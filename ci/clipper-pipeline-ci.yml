@@ -46,6 +46,7 @@ jobs:
                 cd audio-clipper
                 npm install
                 npm test
+
   - name: deploy-to-cf
     public: true
     serial: true
@@ -70,6 +71,7 @@ jobs:
                 npm build
                 cd ..
                 cp -r audio-clipper/* audio-clipper-compiled/
+                
       - put: deploy-app
         params:
           manifest: audio-clipper/manifest.yml
