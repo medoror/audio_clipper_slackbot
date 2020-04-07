@@ -46,7 +46,7 @@ jobs:
                 cd audio-clipper
                 npm install
                 npm test
-  - name: deploy
+  - name: deploy-to-cf
     public: true
     serial: true
     plan:
@@ -59,7 +59,7 @@ jobs:
           inputs:
             - name: audio-clipper
           outputs:
-            - name: artifacts
+            - name: audio-clipper-compiled
           run:
             path: /bin/sh
             args:
@@ -67,10 +67,10 @@ jobs:
               - |
                 cd audio-clipper
                 npm install
-                ./node_modules/typescript/bin/tsc
+                npm build
                 cd ..
-                cp -r audio-clipper/* artifacts/
+                cp -r audio-clipper/* audio-clipper-compiled/
       - put: deploy-app
         params:
           manifest: audio-clipper/manifest.yml
-          path: artifacts
+          path: audio-clipper-compiled
