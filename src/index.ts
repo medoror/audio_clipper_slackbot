@@ -36,7 +36,7 @@ app.command('/audio', async ({payload, ack, say}) => {
         videoFormat = new YoutubeVideo(link, audioFilename, duration);
     } else {
         say("Example USAGE for youtube: " +
-            "/audio [youtube-url] [ duration (10 seconds default) ]")
+            "/audio [youtube-url] [ duration (10 seconds default) ]");
         return;
     }
     try {

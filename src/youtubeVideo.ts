@@ -32,21 +32,15 @@ export class YoutubeVideo implements VideoInterface {
     }
 
     private async downloadFromYoutube(timestamp) {
+        const outStream = fs.createWriteStream(this.audioFilename, {flags: 'a'});
         let ytdlPromise = () => {
             return new Promise(
                 (resolve, reject) => {
-                    ffmpeg().input(
-                        ytdl(this.link, {
-                            filter: function (format) {
-                                if (format.container === 'webm' && format.resolution === null) {
-                                    return true;
-                                }
-                            }
-                        })
-                    ).format('webm')
+                    ffmpeg().input(ytdl(this.link, {filter: YoutubeVideo.filterForWebmCodecs()}))
+                        .format('webm')
                         .seekInput(timestamp)
                         .duration(this.duration)
-                        .pipe(fs.createWriteStream(this.audioFilename, {flags: 'a'}))
+                        .pipe(outStream)
                         .on('finish', () => {
                             resolve();
                         });
@@ -56,6 +50,10 @@ export class YoutubeVideo implements VideoInterface {
         await ytdlPromise().then(() => {
             console.log(`Video Downloaded`)
         }).catch(() => console.log(`Error Downloading Video`));
+    }
+
+    private static filterForWebmCodecs() {
+        return format => format.container === 'webm' && !format.resolution;
     }
 }
 
