@@ -33,6 +33,7 @@ export class YoutubeVideo implements VideoInterface {
 
     private async downloadFromYoutube(timestamp) {
         const outStream = fs.createWriteStream(this.audioFilename, {flags: 'a'});
+        let start = Date.now();
         let ytdlPromise = () => {
             return new Promise(
                 (resolve, reject) => {
@@ -40,8 +41,12 @@ export class YoutubeVideo implements VideoInterface {
                         .format('webm')
                         .seekInput(timestamp)
                         .duration(this.duration)
-                        .pipe(outStream)
-                        .on('finish', () => {
+                        .save(this.audioFilename)
+                        .on('progress', p => {
+                            process.stdout.write(`${p.targetSize}kb downloaded\n`);
+                        })
+                        .on('end', () => {
+                            console.log(`\ndone, thanks - ${(Date.now() - start) / 1000}s`);
                             resolve();
                         });
                 }
