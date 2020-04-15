@@ -1,6 +1,5 @@
 import {VideoInterface} from './videoInterface'
 import {checkYoutubeUrlForTimestamp} from './youtubeUtils';
-import * as fs from 'fs';
 
 const ytdl = require('ytdl-core');
 
@@ -32,7 +31,6 @@ export class YoutubeVideo implements VideoInterface {
     }
 
     private async downloadFromYoutube(timestamp) {
-        const outStream = fs.createWriteStream(this.audioFilename, {flags: 'a'});
         let start = Date.now();
         let ytdlPromise = () => {
             return new Promise(
@@ -58,7 +56,7 @@ export class YoutubeVideo implements VideoInterface {
     }
 
     private static filterForWebmCodecs() {
-        return format => format.container === 'webm' && !format.resolution;
+        return format => format.container === 'webm' && format.audioBitrate;
     }
 }
 
