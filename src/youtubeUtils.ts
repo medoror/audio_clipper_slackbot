@@ -1,7 +1,8 @@
 export const validateYouTubeUrl = (potentialUrl: string) => {
+    const VALID_VIDEO_ID_LENGTH: number = 11;
     if (potentialUrl !== undefined || potentialUrl !== '') {
         const match = parseUrl(potentialUrl, /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=|\?v=)([^#\&\?]*).*/);
-        if (match && match[2].length === 11) {
+        if (match && match[2].length === VALID_VIDEO_ID_LENGTH) {
             return true;
         }
     }
