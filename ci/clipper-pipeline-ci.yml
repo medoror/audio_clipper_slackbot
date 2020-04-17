@@ -25,6 +25,11 @@ resources:
       space: ((cf.space))
       skip_cert_check: true
 
+  - name: notify
+    type: slack-notification
+    source:
+      url: ((slack.clipperWebHook))
+
 jobs:
   - name: run-ci-tests
     public: true
@@ -67,6 +72,8 @@ jobs:
               - -c
               - |
                 cd audio-clipper
+                echo -e "audio clipper app was successfully deployed\n" > commit-info.txt
+                git log -n1 HEAD >> commit-info.txt
                 npm install
                 npm run-script build
                 cd ..
@@ -76,3 +83,7 @@ jobs:
         params:
           manifest: audio-clipper/manifest.yml
           path: audio-clipper-compiled
+
+      - put: notify
+        params:
+          text_file: audio-clipper-compiled/commit-info.txt
