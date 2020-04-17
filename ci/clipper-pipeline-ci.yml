@@ -6,6 +6,13 @@ image-config: &image-config
       repository: node
       tag: "8.12-alpine"
 
+resource_types:
+- name: slack-notification
+  type: docker-image
+  source:
+    repository: cfcommunity/slack-notification-resource
+    tag: latest
+
 resources:
   - name: audio-clipper
     type: git
