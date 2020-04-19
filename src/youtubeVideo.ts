@@ -35,8 +35,8 @@ export class YoutubeVideo implements VideoInterface {
         let ytdlPromise = () => {
             return new Promise(
                 (resolve, reject) => {
-                    ffmpeg().input(ytdl(this.link, {filter: YoutubeVideo.filterForWebmCodecs()}))
-                        .format('webm')
+                    ffmpeg().input(ytdl(this.link, {filter: YoutubeVideo.filterForAppropriateCodecs()}))
+                        .format('mp3')
                         .seekInput(timestamp)
                         .duration(this.duration)
                         .save(this.audioFilename)
@@ -55,7 +55,7 @@ export class YoutubeVideo implements VideoInterface {
         }).catch(() => console.log(`Error Downloading Video`));
     }
 
-    private static filterForWebmCodecs() {
+    private static filterForAppropriateCodecs() {
         return format => format.container === 'webm' && format.audioBitrate;
     }
 }
