@@ -21,6 +21,7 @@ resources:
       branch: master
       username: ((github.username))
       password: ((github.password))
+      skip_ssl_verification: true
 
   - name: deploy-app
     type: cf
