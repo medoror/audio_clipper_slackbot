@@ -23,7 +23,7 @@
     "fluent-ffmpeg": "^2.1.2",
     "form-data": "^3.0.0",
     "mp3-duration": "^1.1.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "rimraf": "^3.0.0",
     "shortid": "^2.2.15",
     "ts-node": "^8.4.1",
