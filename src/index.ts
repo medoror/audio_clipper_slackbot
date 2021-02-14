@@ -7,7 +7,6 @@ import {YoutubeVideo} from "./youtubeVideo";
 import {VideoInterface} from "./videoInterface";
 import {validateYouTubeUrl} from "./youtubeUtils";
 import {App, ExpressReceiver} from "@slack/bolt";
-// import {awsServerlessExpress} from "aws-serverless-express";
 const awsServerlessExpress = require('aws-serverless-express')
 
 const shortid = require('shortid');
@@ -59,13 +58,6 @@ app.command('/audio', async ({payload, ack, say}) => {
         console.log("Something went wrong: " + err)
     }
 });
-
-
-// Start your app
-//(async () => {
-//    await app.start(process.env.PORT || 4000);
-//    console.log('⚡️ Bolt app is running!');
-//})();
 
 // Handle the Lambda function event
 module.exports.handler = (event, context) => {
