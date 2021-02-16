@@ -24,9 +24,10 @@ This will upload audio from the beginning of a given youtube url at the timestam
 duration (in seconds).
 
 
-## Using this slackbot
+## Deploying the slackbot
 
-TBD
-
-## Improvements
-1. Tests for slack api and youtube video apis
+1. Clone this repo
+1. `cp _env .env`
+1. `source .env`
+1. Add your slack secret and token to your env files
+1. Follow the instructions to deploy and manage: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda
