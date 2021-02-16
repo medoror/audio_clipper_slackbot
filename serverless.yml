@@ -1,3 +1,5 @@
+org: edoror
+app: audio-clipper
 service: audio-clipper-slackbot
 
 plugins:
@@ -8,7 +10,7 @@ useDotenv: true
 provider:
   name: aws
   runtime: nodejs12.x
-  region: ap-northeast-1
+  region: us-west-2
   memorySize: 128
   environment:
     SLACK_SIGNING_SECRET: ${env:SLACK_SIGNING_SECRET}
