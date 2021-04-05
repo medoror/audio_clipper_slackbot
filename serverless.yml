@@ -23,3 +23,7 @@ functions:
       - http:
           method: post
           path: /slack/events
+
+layers:
+  ffmpeg:
+    path: layer
