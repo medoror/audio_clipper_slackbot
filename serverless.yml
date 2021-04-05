@@ -23,6 +23,8 @@ functions:
       - http:
           method: post
           path: /slack/events
+    layers:
+      - {Ref: FfmpegLambdaLayer}
 
 layers:
   ffmpeg:
