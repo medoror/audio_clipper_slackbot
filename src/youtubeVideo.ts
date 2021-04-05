@@ -5,7 +5,8 @@ const ytdl = require('ytdl-core');
 
 const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
 const ffmpeg = require('fluent-ffmpeg');
-ffmpeg.setFfmpegPath(ffmpegPath);
+//ffmpeg.setFfmpegPath(ffmpegPath);
+ffmpeg.setFfmpegPath('/opt/ffmpeg');
 
 
 export class YoutubeVideo implements VideoInterface {
