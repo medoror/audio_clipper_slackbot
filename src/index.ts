@@ -5,10 +5,10 @@ import {YoutubeVideo} from "./youtubeVideo";
 import {VideoInterface} from "./videoInterface";
 import {validateYouTubeUrl} from "./youtubeUtils";
 import {App, ExpressReceiver} from "@slack/bolt";
+
 const serverlessExpress = require('@vendia/serverless-express');
-
-
 const shortid = require('shortid');
+
 const DEFAULT_DURATION_SECONDS: number = 10;
 
 const expressReceiver = new ExpressReceiver({
@@ -58,5 +58,3 @@ app.command('/audio', async ({payload, ack, say}) => {
 module.exports.handler = serverlessExpress({
   app: expressReceiver.app
 });
-
-

@@ -22,9 +22,6 @@ functions:
       - http:
           method: post
           path: /slack/events
-          response:
-            headers:
-              Content-Type: "'text/html'"
     layers:
       - {Ref: FfmpegLambdaLayer}
 

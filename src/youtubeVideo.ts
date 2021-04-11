@@ -60,6 +60,3 @@ export class YoutubeVideo implements VideoInterface {
         return format => format.container === 'webm' && format.audioBitrate;
     }
 }
-
-
-
