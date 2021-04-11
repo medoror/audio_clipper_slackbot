@@ -7,7 +7,6 @@ import {YoutubeVideo} from "./youtubeVideo";
 import {VideoInterface} from "./videoInterface";
 import {validateYouTubeUrl} from "./youtubeUtils";
 import {App, ExpressReceiver} from "@slack/bolt";
-//const awsServerlessExpress = require('aws-serverless-express')
 const serverlessExpress = require('@vendia/serverless-express');
 
 
@@ -23,8 +22,6 @@ const app = new App({
     receiver: expressReceiver,
     token: process.env.SLACK_BOT_TOKEN
 });
-
-//const server = awsServerlessExpress.createServer(expressReceiver.app);
 
 function generateDuration(duration, defaultDuration) {
     return !duration || isNaN(parseInt(duration)) ? defaultDuration : duration;
@@ -62,12 +59,6 @@ app.command('/audio', async ({payload, ack, say}) => {
     }
 });
 
-// Handle the Lambda function event
-//module.exports.handler = (event, context) => {
-//  console.log('⚡️ Bolt app is running!');
-//  awsServerlessExpress.proxy(server, event, context);
-//};
-//
 module.exports.handler = serverlessExpress({
   app: expressReceiver.app
 });

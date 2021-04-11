@@ -2,10 +2,9 @@ import {VideoInterface} from './videoInterface'
 import {checkYoutubeUrlForTimestamp} from './youtubeUtils';
 
 const ytdl = require('ytdl-core');
-
+const ffmpeg = require('fluent-ffmpeg');
 // TODO: enable the installer path via a flag
 //const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path;
-const ffmpeg = require('fluent-ffmpeg');
 //ffmpeg.setFfmpegPath(ffmpegPath);
 ffmpeg.setFfmpegPath('/opt/ffmpeg/ffmpeg');
 
