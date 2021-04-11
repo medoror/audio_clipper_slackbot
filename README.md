@@ -30,4 +30,5 @@ duration (in seconds).
 1. `cp _env .env`
 1. `source .env`
 1. Add your slack secret and token to your env files
-1. Follow the instructions to deploy and manage: https://github.com/slackapi/bolt-js/tree/main/examples/deploy-aws-lambda
+1. `yarn build` to generate javascript files
+1. Follow the instructions to deploy and manage: https://slack.dev/bolt-js/deployments/aws-lambda
