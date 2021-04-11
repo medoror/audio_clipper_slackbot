@@ -1,5 +1,3 @@
-import {deleteMp3Files} from "./fileUtils";
-
 require('dotenv').config();
 
 import {Slack} from "./slack";
@@ -52,8 +50,6 @@ app.command('/audio', async ({payload, ack, say}) => {
         const slackApi = new Slack(payload.channel_name);
         await slackApi.uploadToSlack(audioFilename);
 
-        // delete the downloaded mp3 when finished
-        deleteMp3Files();
     } catch (err) {
         console.log("Something went wrong: " + err)
     }
