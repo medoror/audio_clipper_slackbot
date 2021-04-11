@@ -2,9 +2,6 @@ org: edoror
 app: audio-clipper
 service: audio-clipper-slackbot
 
-plugins:
-  - serverless-offline
-
 useDotenv: true
 
 provider:
