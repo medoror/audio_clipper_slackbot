@@ -7,13 +7,16 @@ import {YoutubeVideo} from "./youtubeVideo";
 import {VideoInterface} from "./videoInterface";
 import {validateYouTubeUrl} from "./youtubeUtils";
 import {App, ExpressReceiver} from "@slack/bolt";
-const awsServerlessExpress = require('aws-serverless-express')
+//const awsServerlessExpress = require('aws-serverless-express')
+const serverlessExpress = require('@vendia/serverless-express');
+
 
 const shortid = require('shortid');
 const DEFAULT_DURATION_SECONDS: number = 10;
 
 const expressReceiver = new ExpressReceiver({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
+  processBeforeResponse: true
 });
 
 const app = new App({
@@ -21,7 +24,7 @@ const app = new App({
     token: process.env.SLACK_BOT_TOKEN
 });
 
-const server = awsServerlessExpress.createServer(expressReceiver.app);
+//const server = awsServerlessExpress.createServer(expressReceiver.app);
 
 function generateDuration(duration, defaultDuration) {
     return !duration || isNaN(parseInt(duration)) ? defaultDuration : duration;
@@ -35,7 +38,7 @@ app.command('/audio', async ({payload, ack, say}) => {
     ack();
     let link: string = payload.text.split(" ")[0];
     let duration: number = generateDuration(payload.text.split(" ")[1], DEFAULT_DURATION_SECONDS);
-    let audioFilename: string = generateAudioFileName();
+    let audioFilename: string = "/tmp/"+generateAudioFileName();
     let videoFormat: VideoInterface;
 
     if (validateYouTubeUrl(link)) {
@@ -60,9 +63,13 @@ app.command('/audio', async ({payload, ack, say}) => {
 });
 
 // Handle the Lambda function event
-module.exports.handler = (event, context) => {
-  console.log('⚡️ Bolt app is running!');
-  awsServerlessExpress.proxy(server, event, context);
-};
+//module.exports.handler = (event, context) => {
+//  console.log('⚡️ Bolt app is running!');
+//  awsServerlessExpress.proxy(server, event, context);
+//};
+//
+module.exports.handler = serverlessExpress({
+  app: expressReceiver.app
+});
 
 
